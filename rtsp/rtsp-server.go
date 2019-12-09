@@ -120,22 +120,25 @@ func (server *Server) Start() (err error) {
 						logger.Printf("pusher:%#v", pusher)
 						cmd := pusher2ffmpegMap[pusher]
 						logger.Printf("cmd:%v", cmd)
-						proc := cmd.Process
-						if proc != nil {
-							logger.Printf("prepare to SIGTERM to process:%v", proc)
-							proc.Signal(syscall.SIGTERM)
-							proc.Wait()
-							// proc.Kill()
-							// no need to close attached log file.
-							// see "Wait releases any resources associated with the Cmd."
-							// if closer, ok := cmd.Stdout.(io.Closer); ok {
-							// 	closer.Close()
-							// 	logger.Printf("process:%v Stdout closed.", proc)
-							// }
-							logger.Printf("process:%v terminate.", proc)
+						if cmd != nil {
+							proc := cmd.Process
+							if proc != nil {
+								logger.Printf("prepare to SIGTERM to process:%v", proc)
+								proc.Signal(syscall.SIGTERM)
+								proc.Wait()
+								// proc.Kill()
+								// no need to close attached log file.
+								// see "Wait releases any resources associated with the Cmd."
+								// if closer, ok := cmd.Stdout.(io.Closer); ok {
+								// 	closer.Close()
+								// 	logger.Printf("process:%v Stdout closed.", proc)
+								// }
+								logger.Printf("process:%v terminate.", proc)
+							}
+							delete(pusher2ffmpegMap, pusher)
+							logger.Printf("delete ffmpeg from pull stream from pusher[%v]", pusher)
 						}
-						delete(pusher2ffmpegMap, pusher)
-						logger.Printf("delete ffmpeg from pull stream from pusher[%v]", pusher)
+
 					} else {
 						for _, cmd := range pusher2ffmpegMap {
 							proc := cmd.Process
